@@ -33,6 +33,32 @@ SYMBOL_TABLE = {'RO':0, 'R1':1, 'R2':2, 'R3':3, 'R4':4, 'R5':5,
                 'R12':12, 'R13':13, 'R14':14, 'R15':15, 'SCREEN':16384, 'KBD':24576,
                 'SP':0, 'LCL':1, 'ARG':2, 'THIS':3, 'THAT':4}
 
+# Methods to identify different properties of lines.
+def is_ignorable(ig_line):
+    """If line is a comment or contains only whitespace"""
+    ig_regex = re.compile(r'^\s*//.*$|^\s*$')
+    if ig_regex.match(ig_line):
+        return True
+    else:
+        return False
+
+def clean_up_line(cl_line):
+    """Remove whitespace & comments from line leaving only useful commands behind"""
+    cl_line = re.sub(r'\s', '', cl_line)
+    comment_int = None
+    cl_line = re.sub(r'//.*', '', cl_line)
+    return cl_line
+
+
+def is_position_symbol(symb_line):
+    """Checks to see if command is a symbol that needs to
+    be recorded as a position in the command list."""
+    symbol_syntax = re.compile(r'^\(.+\)$')
+    if symbol_syntax.search(symb_line):
+        return True
+    else:
+        return False
+
 # Open file through command-line args.
 # Read into list, removing whitespace and comments.
 COMMANDS_LIST = []
@@ -48,23 +74,12 @@ with open(sys.argv[1], 'r') as asm_file:
                 SYMBOL_TABLE[line.strip('()')] = LINE_COUNTER + 1
             else:
                 COMMANDS_LIST.append(line)
-            # Increment after operations on current line of habeen completed.
-            LINE_COUNTER += 1
+                # Increment after operations on current line of habeen completed.
+                LINE_COUNTER += 1
 
-# TODO: Fill out methods below
 
-# Methods to identify different properties of lines.
-def is_ignorable(ig_line):
-    """If line is a comment or contains only whitespace"""
 
-def clean_up_line(cl_line):
-    """Remove whitespace & comments from line leaving only useful commands behind"""
 
-def is_position_symbol(symb_line):
-    """Checks to see if command is a symbol that needs to
-    be recorded as a position in the command list."""
-    symbol_syntax = re.compile(r'\([A-Z]+\)')
-    if symbol_syntax.search(symb_line):
-        return True
-    else:
-        return False
+print(str(COMMANDS_LIST))
+print(str(SYMBOL_TABLE))
+print(LINE_COUNTER)
