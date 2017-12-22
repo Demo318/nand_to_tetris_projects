@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # From Nand to Tetris Pt. 1, ch6.
-# Create program to convert symbolic assembly code into binary code.
+"""Create program to convert symbolic assembly code into binary code."""
 
 # Step 1: First Pass
 # Open file.
@@ -21,6 +21,7 @@
 
 import sys
 import re
+import os
 
 if len(sys.argv) < 2:
     print('Usage: python3 hack_assembler.py [usr_file.asm] - assemble to machine language.')
@@ -69,39 +70,16 @@ with open(sys.argv[1], 'r') as asm_file:
         else:
             line = clean_up_line(line)
             if is_position_symbol(line):
-                SYMBOL_TABLE[line.strip('()')] = LINE_COUNTER + 1
+                SYMBOL_TABLE[line.strip('()')] = LINE_COUNTER
             else:
                 COMMANDS_LIST.append(line)
                 # Increment after operations on current line of habeen completed.
                 LINE_COUNTER += 1
 
-
-
-
 # Step 2: Second Pass
 # Convert all symbolic code into binary assembly code.
 # Catch all variables and record them to the symbol table,
 # staring memory at n = 16 and counting up from there.
-
-"""
-Sample Logic Flow:
-    Is A-Command?:
-        Is not number?:
-            If is not in table?
-                Add symbol to table w/ new number
-                    if RAM 
-                        use RAM number
-                    else (is variable)
-                        find new number (make sure not previously used and not in SCRN range)
-            Retreive number
-        convert to binary command
-    Else (Is C-Command):
-        REGEX to split into dest, comp, & jmp
-        dest_translate()
-        comp_translate()
-        jmp_translate()
-        organize binary command
-    Commit change"""
 
 def is_a_command(a_cam_tst):
     """Checks if string begins with '@' character."""
@@ -109,8 +87,8 @@ def is_a_command(a_cam_tst):
 
 def is_in_symb_table(symb_table, tst_symb):
     """Checks if tst_symb is in dict symb_table."""
-    for i in enumerate(symb_table):
-        if i[1] == tst_symb:
+    for k in enumerate(symb_table):
+        if k[1] == tst_symb:
             return True
     return False
 
@@ -120,7 +98,6 @@ def mem_taken(mem_num, symb_table):
         if val == mem_num and not key == key.upper():
             return True
     return False
-
 
 COMP_TABLE = {'0':'0101010', '1':'0111111', '-1':'0111010',
               'D':'0001100', 'A':'0110000', 'M':'1110000',
@@ -141,7 +118,7 @@ JUMP_TABLE = {'JGT':'001', 'JEQ':'010', 'JGE':'011', 'JLT':'100',
 
 VAR_MEM_COUNTER = 16
 BIN_COMMAND_LIST = []
-C_COMM_REGEX = re.compile(r'(^[A|M|D]+)?(=)?([A|M|D|!|-|+|0|1|&|\|]+)(;)?(\w{3})?')
+C_COMM_REGEX = re.compile(r'(^[A|M|D]+)?(=)?([A|M|D|!|\-|+|0|1|&|\|]+)(;)?(\w{3})?')
 for i, symbol_command in enumerate(COMMANDS_LIST):
     instruction_command = '0'
     # Is this A-Command instruction?
@@ -165,34 +142,28 @@ for i, symbol_command in enumerate(COMMANDS_LIST):
                             exit()
                     SYMBOL_TABLE[address] = VAR_MEM_COUNTER
             address_num = SYMBOL_TABLE[address]
-            
         else:
             address_num = address
         # Construct final binary command.
-        bin_address = str(bin(int(address_num))).lstrip('0b').rjust(15,'0')
-        full_command = instruction_command + bin_address    
-
-        
-        
-
+        bin_address = str(bin(int(address_num))).lstrip('0b').rjust(15, '0')
+        full_command = instruction_command + bin_address
 
     # Is C-Command instruction
     else:
         c_comm_split = C_COMM_REGEX.search(symbol_command)
-        full_command = '111' + COMP_TABLE[str(c_comm_split.group(3))] + DEST_TABLE[str(c_comm_split.group(1))] + JUMP_TABLE[str(c_comm_split.group(5))]
+        full_command = ('111' +
+                        COMP_TABLE[str(c_comm_split.group(3))] +
+                        DEST_TABLE[str(c_comm_split.group(1))] +
+                        JUMP_TABLE[str(c_comm_split.group(5))])
 
+    BIN_COMMAND_LIST.append(full_command + "\n")
 
+# Step 3: Create new .hack file
+DESTINATION_FILE_NAME = str(re.compile(r'(.+)(\.\w+)').search(sys.argv[1]).group(1)) + '.hack'
+# DESTINATION_FILE_NAME = ORIGIN_FILE_NAME.groups(1) + '.hack'
+if os.path.exists(DESTINATION_FILE_NAME):
+    os.remove(DESTINATION_FILE_NAME)
+DESTINATION_FILE = open(str(DESTINATION_FILE_NAME), "w+")
+DESTINATION_FILE.writelines(BIN_COMMAND_LIST)
 
-    BIN_COMMAND_LIST.append(full_command)
-        
-print('Commands List, Symbole Table, & Line Counter:')
-
-print(str(COMMANDS_LIST))
-print(str(SYMBOL_TABLE))
-print(str(BIN_COMMAND_LIST))
-print(LINE_COUNTER)
-
-
-
-
-
+print('File written to: ' + os.path.abspath(DESTINATION_FILE_NAME))
