@@ -1,0 +1,11 @@
+// Helper chip for making Mux8Way16
+
+CHIP Mux8Way {
+    IN a, b, c, d, e, f, g, h, sel[3];
+    OUT out;
+
+    PARTS:
+    Mux4Way (a=a, b=b, c=c, d=d, sel[0]=sel[0], sel[1]=sel[1], out=muxabcd);
+    Mux4Way (a=e, b=f, c=g, d=h, sel[0]=sel[0], sel[1]=sel[1], out=muxefgh);
+    Mux (a=muxabcd, b=muxefgh, sel=sel[2], out=out);
+}

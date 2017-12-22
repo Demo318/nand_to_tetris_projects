@@ -1,0 +1,36 @@
+// Helper chip for making Mux4Way16
+
+CHIP Mux4Way {
+    IN a, b, c, d, sel[2];
+    OUT out;
+
+    PARTS:
+    //Opposite of sel values
+    Not (in=sel[0], out=notsel0);
+    Not (in=sel[1], out=notsel1);
+
+    //process a input
+    And (a=a, b=notsel1, out=anda1);
+    And (a=anda1, b=notsel0, out=anda2);
+
+    //process b input
+    And (a=b, b=notsel1, out=andb1);
+    And (a=andb1, b=sel[0], out=andb2);
+
+    //or a+b
+    Or (a=anda2, b=andb2, out=orab);
+
+    //process c input
+    And (a=c, b=sel[1], out=andc1);
+    And (a=andc1, b=notsel0, out=andc2);
+
+    //or ab+c
+    Or (a=orab, b=andc2, out=orabc);
+
+    //process d input
+    And (a=d, b=sel[1], out=andd1);
+    And (a=andd1, b=sel[0], out=andd2);
+
+    //or abc+d
+    Or (a=orabc, b=andd2, out=out);
+}
