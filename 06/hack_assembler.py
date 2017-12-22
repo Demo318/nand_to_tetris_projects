@@ -44,9 +44,7 @@ def is_ignorable(ig_line):
 
 def clean_up_line(cl_line):
     """Remove whitespace & comments from line leaving only useful commands behind"""
-    cl_line = re.sub(r'\s', '', cl_line)
-    comment_int = None
-    cl_line = re.sub(r'//.*', '', cl_line)
+    cl_line = re.sub(r'\s', '', re.sub(r'//.*', '', cl_line))
     return cl_line
 
 
@@ -77,9 +75,39 @@ with open(sys.argv[1], 'r') as asm_file:
                 # Increment after operations on current line of habeen completed.
                 LINE_COUNTER += 1
 
-
-
-
+print('Commands List, Symbole Table, & Line Counter:')
 print(str(COMMANDS_LIST))
 print(str(SYMBOL_TABLE))
 print(LINE_COUNTER)
+
+
+
+# Step 2: Second Pass
+# Convert all symbolic code into binary assembly code.
+# Catch all variables and record them to the symbol table,
+# staring memory at n = 16 and counting up from there.
+
+"""
+Sample Logic Flow:
+    Is A-Command?:
+        Is not number?:
+            Symbol in table?
+                Retreive number
+            Else:
+                Add symbol to table w/ new number
+                    if RAM 
+                        use RAM number
+                    else (is variable)
+                        find new number (make sure not previously used and not in SCRN range)
+                Retreive number
+        convert to binary command
+    Else (Is C-Command):
+        REGEX to split into dest, comp, & jmp
+        dest_translate()
+        comp_translate()
+        jmp_translate()
+        organize binary command
+    Commit change"""
+
+for i, symbol_command in enumerate(COMMANDS_LIST):
+
