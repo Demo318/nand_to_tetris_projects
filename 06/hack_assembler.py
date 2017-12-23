@@ -165,5 +165,6 @@ if os.path.exists(DESTINATION_FILE_NAME):
     os.remove(DESTINATION_FILE_NAME)
 DESTINATION_FILE = open(str(DESTINATION_FILE_NAME), "w+")
 DESTINATION_FILE.writelines(BIN_COMMAND_LIST)
+DESTINATION_FILE.close()
 
 print('File written to: ' + os.path.abspath(DESTINATION_FILE_NAME))
