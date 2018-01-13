@@ -15,10 +15,16 @@ class HackFileMaker:
     def make_file(self, bin_commands):
         """Takes list of bin_commands, writes new file.
         """
-        if os.path.exists(self.dest_file_name):
-            os.remove(self.dest_file_name)
+        bin_commands = self.add_line_breaks(bin_commands)
         destination_file = open(str(self.dest_file_name), "w+")
         destination_file.writelines(bin_commands)
         destination_file.close()
 
         print('File written to: ' + os.path.abspath(self.dest_file_name))
+
+    @staticmethod
+    def add_line_breaks(this_list):
+        """Add \\n to each item in list."""
+        for i in enumerate(this_list):
+            this_list[i[0]] = i[1] + "\n"
+        return this_list

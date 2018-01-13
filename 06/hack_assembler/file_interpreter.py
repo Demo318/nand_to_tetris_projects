@@ -29,7 +29,7 @@ class FileInterpreter:
                         self.symbol_table[line.strip('()')] = line_counter
                     else:
                         self.commands_list.append(line)
-                        # Increment after operations on current line of habeen completed.
+                        # Increment after operations on current line of have been completed.
                         line_counter += 1
 
 

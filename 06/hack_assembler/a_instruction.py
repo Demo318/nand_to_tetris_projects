@@ -53,7 +53,7 @@ class AInstruction:
 
     def assign_as_ram(self):
         """Records into symbol table as RAM"""
-        self.symbol_table[self.command] = int(self.command[4:-2])
+        self.symbol_table[self.command] = int(self.command[4:]) # This was to -2
 
     def assign_new_memory(self):
         """Finds a new memory address. First checks what the latest unassigned memory is."""
