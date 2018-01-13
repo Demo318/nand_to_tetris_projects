@@ -25,3 +25,17 @@ class CInstruction:
                   'JNE':'101', 'JLE':'110', 'JMP':'111', 'None':'000'}
 
     c_inst_regex = re.compile(r'(^[A|M|D]+)?(=)?([A|M|D|!|\-|+|0|1|&|\|]+)(;)?(\w{3})?')
+
+    def __init__(self, instruction):
+        self.instruction = instruction
+
+    def translate(self):
+        """Uses class tables comp_table, dest_table, and jump_table to
+        interpret symbolic commands and replace with binary instruction code.
+        """
+        c_comm_split = CInstruction.c_inst_regex.search(self.instruction)
+        bin_c_inst = ('111' +
+                      CInstruction.comp_table[str(c_comm_split.group(3))] +
+                      CInstruction.dest_table[str(c_comm_split.group(1))] +
+                      CInstruction.jump_table[str(c_comm_split.group(5))])
+        return bin_c_inst

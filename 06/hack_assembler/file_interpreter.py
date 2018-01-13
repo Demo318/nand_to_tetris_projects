@@ -1,3 +1,6 @@
+"""Module for initial contac with .asm file.
+"""
+
 import re
 
 class FileInterpreter:
